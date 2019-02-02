@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 from tkinter import filedialog
 from PIL import Image
 from PIL import ImageTk
@@ -35,11 +36,11 @@ class MainApplication():
         self.height_slider = Scale(parent, from_=100, to=3000, orient=HORIZONTAL, length=260, resolution=10, command=self.update_width_slider)
         self.height_slider.grid(row=2, column=2, columnspan=2)
 
-        self.open_button = Button(parent, text="Open", command= lambda: self.update_image(parent))
+        self.open_button = ttk.Button(parent, text="Open", command= lambda: self.update_image(parent))
         self.open_button.grid(row=3, column=0, sticky=NSEW)
-        self.open_button = Button(parent, text="Save", command=self.save_image)
+        self.open_button = ttk.Button(parent, text="Save", command=self.save_image)
         self.open_button.grid(row=3, column=1, columnspan=2, sticky=NSEW)
-        self.open_button = Button(parent, text="Reset", command=self.reset_sliders)
+        self.open_button = ttk.Button(parent, text="Reset", command=self.reset_sliders)
         self.open_button.grid(row=3, column=3, sticky=NSEW)
 
         self.update_image(parent)
@@ -52,7 +53,7 @@ class MainApplication():
         print("saving image of dimension: {}x{}".format(self.width_slider.get(),self.height_slider.get()))
         self.pil_image_resized = self.pil_image.resize((self.width_slider.get(), self.height_slider.get()), Image.ANTIALIAS)
         print("file {}-{}x{}.{} saved".format(os.path.splitext(self.pil_image.filename)[0],self.width_slider.get(),self.height_slider.get(), self.pil_image.format.lower()))
-        self.pil_image_resized.save("{}-{}x{}.{}".format(os.path.splitext(self.pil_image.filename)[0],self.width_slider.get(),self.height_slider.get(), self.pil_image.format.lower()))
+        self.pil_image_resized.save("{}-{}x{}.{}".format(os.path.splitext(self.pil_image.filename)[0],self.width_slider.get(),self.height_slider.get(), self.pil_image.format.lower()),quality=95)
 
 
     def update_image(self, parent):
@@ -80,44 +81,40 @@ class MainApplication():
         self.pil_image = Image.open(self.file_name)
         self.actual_height=self.pil_image.height
         self.actual_width=self.pil_image.width
-        # resize image
-        self.pil_image.thumbnail((800,800), Image.ANTIALIAS)
+        self.ratio=float(self.actual_height)/self.actual_width
+        self.pil_image.thumbnail((800,800), Image.ANTIALIAS) # resize image
 
     def update_window_size(self, parent):
-        if self.pil_image.width < self.WINDOW_MIN_WIDTH:
+        if self.pil_image.width < self.WINDOW_MIN_WIDTH: # handling for narrow images
             width = self.WINDOW_MIN_WIDTH
         else:
             width = self.pil_image.width + 5
         parent.geometry("{}x{}".format(width, self.pil_image.height+150))
 
     def update_height_slider(self, value):
-        ratio = float(self.actual_height)/self.actual_width
-        self.height_slider.set(int(float(value)*ratio))
+        self.height_slider.set(int(float(value)*self.ratio))
 
     def update_width_slider(self, value):
-        ratio = float(self.actual_width)/self.actual_height
-        self.width_slider.set(int(float(value)*ratio))
+        self.width_slider.set(int(float(value)/self.ratio))
 
     def cal_slider_values(self):
         self.min_corr_height = self.min_corr_width = 100
         self.max_corr_height = self.max_corr_width = 3000
-        ratio = float(self.actual_height)/self.actual_width
-        if ratio > 1:
-            self.min_corr_height = int(float(100)*ratio)
+        if self.ratio > 1:
+            self.min_corr_height = int(float(100)*self.ratio)
         else:
-            self.max_corr_height = int(float(3000)*ratio)
+            self.max_corr_height = int(float(3000)*self.ratio)
         
-        ratio = float(self.actual_width)/self.actual_height
-        if ratio > 1:
-            self.min_corr_width = int(float(100)*ratio)
+        if 1/self.ratio > 1:
+            self.min_corr_width = int(float(100)/self.ratio)
         else:
-            self.max_corr_width = int(float(3000)*ratio)
+            self.max_corr_width = int(float(3000)/self.ratio)
 
         
 
 
 if __name__ == "__main__":
     root = Tk()
-    root.resizable(False, False)
+    root.resizable(False, False) #disable resizing
     MainApplication(root)
     root.mainloop()
