@@ -5,30 +5,42 @@ from PIL import ImageTk
 import os
 
 class MainApplication():
+    WINDOW_MIN_HEIGHT = 320
+    WINDOW_MIN_WIDTH = 620
+
     def __init__(self, parent):
         parent.title("Image Resizer")
-        parent.geometry("420x300")
+        parent.grid_rowconfigure(0, weight=1)
+        parent.grid_rowconfigure(2, weight=1)
+        parent.grid_rowconfigure(3, weight=1)
+        parent.grid_columnconfigure(0, weight=1)
+        parent.grid_columnconfigure(1, weight=1)
+        parent.grid_columnconfigure(2, weight=1)
+        parent.grid_columnconfigure(3, weight=1)
+        parent.geometry("{}x{}+20+20".format(self.WINDOW_MIN_WIDTH, self.WINDOW_MIN_HEIGHT))
 
         # build canvas
-        self.canvas = Canvas(parent, width=400, height=200, borderwidth=2)
+        self.canvas = Canvas(parent, width=620, height=200, borderwidth=2)
         self.canvas.grid(row=0, column=0, columnspan=4)
         self.tk_image = ImageTk.PhotoImage(Image.new('RGB', (0,0)))
         self.image_on_canvas = self.canvas.create_image(0, 0, anchor=NW, image=self.tk_image)
 
         self.width_label = Label(parent, text="Width")
-        self.width_label.grid(row=1, column=0)
+        self.width_label.grid(row=1, column=0, sticky=NSEW)
         self.height_label = Label(parent, text="Height")
-        self.height_label.grid(row=1, column=1)
+        self.height_label.grid(row=1, column=2, sticky=NSEW)
+
         self.width_slider = Scale(parent, from_=100, to=3000, orient=HORIZONTAL, length=260, resolution=10, command=self.update_height_slider)
         self.width_slider.grid(row=2, column=0, columnspan=2)
         self.height_slider = Scale(parent, from_=100, to=3000, orient=HORIZONTAL, length=260, resolution=10, command=self.update_width_slider)
         self.height_slider.grid(row=2, column=2, columnspan=2)
+
         self.open_button = Button(parent, text="Open", command= lambda: self.update_image(parent))
-        self.open_button.grid(row=3, column=0)
+        self.open_button.grid(row=3, column=0, sticky=NSEW)
         self.open_button = Button(parent, text="Save", command=self.save_image)
-        self.open_button.grid(row=3, column=1)
+        self.open_button.grid(row=3, column=1, columnspan=2, sticky=NSEW)
         self.open_button = Button(parent, text="Reset", command=self.reset_sliders)
-        self.open_button.grid(row=3, column=2)
+        self.open_button.grid(row=3, column=3, sticky=NSEW)
 
         self.update_image(parent)
 
@@ -69,7 +81,11 @@ class MainApplication():
         self.pil_image.thumbnail((800,800), Image.ANTIALIAS)
 
     def update_window_size(self, parent):
-        parent.geometry("{}x{}".format(self.pil_image.width+5, self.pil_image.height+110))
+        if self.pil_image.width < self.WINDOW_MIN_WIDTH:
+            width = self.WINDOW_MIN_WIDTH
+        else:
+            width = self.pil_image.width + 5
+        parent.geometry("{}x{}".format(width, self.pil_image.height+150))
 
     def update_height_slider(self, value):
         ratio = float(self.actual_height)/self.actual_width
@@ -82,5 +98,6 @@ class MainApplication():
 
 if __name__ == "__main__":
     root = Tk()
+    root.resizable(False, False)
     MainApplication(root)
     root.mainloop()
