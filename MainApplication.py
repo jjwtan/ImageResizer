@@ -62,6 +62,9 @@ class MainApplication():
             self.update_window_size(parent)
             self.width_slider.set(self.actual_width)
             self.height_slider.set(self.actual_height)
+            self.cal_slider_values()
+            self.width_slider.config(from_=self.min_corr_width, to=self.max_corr_width)
+            self.height_slider.config(from_=self.min_corr_height, to=self.max_corr_height)
             self.canvas.config(width=self.pil_image.width, height=self.pil_image.height)
             self.canvas.itemconfig(self.image_on_canvas, image=self.tk_image)
 
@@ -94,6 +97,23 @@ class MainApplication():
     def update_width_slider(self, value):
         ratio = float(self.actual_width)/self.actual_height
         self.width_slider.set(int(float(value)*ratio))
+
+    def cal_slider_values(self):
+        self.min_corr_height = self.min_corr_width = 100
+        self.max_corr_height = self.max_corr_width = 3000
+        ratio = float(self.actual_height)/self.actual_width
+        if ratio > 1:
+            self.min_corr_height = int(float(100)*ratio)
+        else:
+            self.max_corr_height = int(float(3000)*ratio)
+        
+        ratio = float(self.actual_width)/self.actual_height
+        if ratio > 1:
+            self.min_corr_width = int(float(100)*ratio)
+        else:
+            self.max_corr_width = int(float(3000)*ratio)
+
+        
 
 
 if __name__ == "__main__":
