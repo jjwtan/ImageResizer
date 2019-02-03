@@ -3,25 +3,24 @@ from tkinter import ttk
 from tkinter import filedialog
 from PIL import Image
 from PIL import ImageTk
+from configurations import *
 import os
 
 class MainApplication():
-    WINDOW_MIN_HEIGHT = 320
-    WINDOW_MIN_WIDTH = 620
 
     def __init__(self, parent):
         parent.title("Image Resizer")
-        parent.grid_rowconfigure(0, weight=1)
+        parent.grid_rowconfigure(0, weight=2)
         parent.grid_rowconfigure(2, weight=1)
         parent.grid_rowconfigure(3, weight=1)
         parent.grid_columnconfigure(0, weight=1)
         parent.grid_columnconfigure(1, weight=1)
         parent.grid_columnconfigure(2, weight=1)
         parent.grid_columnconfigure(3, weight=1)
-        parent.geometry("{}x{}+20+20".format(self.WINDOW_MIN_WIDTH, self.WINDOW_MIN_HEIGHT))
+        parent.geometry("{}x{}+20+20".format(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT))
 
-        # build canvas
-        self.canvas = Canvas(parent, width=620, height=200, borderwidth=2)
+        # build inital canvas
+        self.canvas = Canvas(parent, width=INIT_CANVAS_WIDTH, height=INIT_CANVAS_HEIGHT, borderwidth=2)
         self.canvas.grid(row=0, column=0, columnspan=4)
         self.tk_image = ImageTk.PhotoImage(Image.new('RGB', (0,0)))
         self.image_on_canvas = self.canvas.create_image(0, 0, anchor=NW, image=self.tk_image)
@@ -31,9 +30,9 @@ class MainApplication():
         self.height_label = Label(parent, text="Height")
         self.height_label.grid(row=1, column=2, sticky=NSEW)
 
-        self.width_slider = Scale(parent, from_=100, to=3000, orient=HORIZONTAL, length=260, resolution=10, command=self.update_height_slider)
+        self.width_slider = Scale(parent, from_=DEFAULT_SLIDER_MIN, to=DEFAULT_SLIDER_MAX, orient=HORIZONTAL, length=260, resolution=10, command=self.update_height_slider)
         self.width_slider.grid(row=2, column=0, columnspan=2)
-        self.height_slider = Scale(parent, from_=100, to=3000, orient=HORIZONTAL, length=260, resolution=10, command=self.update_width_slider)
+        self.height_slider = Scale(parent, from_=DEFAULT_SLIDER_MIN, to=DEFAULT_SLIDER_MAX, orient=HORIZONTAL, length=260, resolution=10, command=self.update_width_slider)
         self.height_slider.grid(row=2, column=2, columnspan=2)
 
         self.open_button = ttk.Button(parent, text="Open", command= lambda: self.update_image(parent))
@@ -82,11 +81,11 @@ class MainApplication():
         self.actual_height=self.pil_image.height
         self.actual_width=self.pil_image.width
         self.ratio=float(self.actual_height)/self.actual_width
-        self.pil_image.thumbnail((800,800), Image.ANTIALIAS) # resize image
+        self.pil_image.thumbnail((MAX_IMAGE_THUMBNAIL_HEIGHT,MAX_IMAGE_THUMBNAIL_WIDTH), Image.ANTIALIAS) # resize image
 
     def update_window_size(self, parent):
-        if self.pil_image.width < self.WINDOW_MIN_WIDTH: # handling for narrow images
-            width = self.WINDOW_MIN_WIDTH
+        if self.pil_image.width < WINDOW_MIN_WIDTH: # handling for narrow images
+            width = WINDOW_MIN_WIDTH
         else:
             width = self.pil_image.width + 5
         parent.geometry("{}x{}".format(width, self.pil_image.height+150))
@@ -98,23 +97,23 @@ class MainApplication():
         self.width_slider.set(int(float(value)/self.ratio))
 
     def cal_slider_values(self):
-        self.min_corr_height = self.min_corr_width = 100
-        self.max_corr_height = self.max_corr_width = 3000
+        self.min_corr_height = self.min_corr_width = DEFAULT_SLIDER_MIN
+        self.max_corr_height = self.max_corr_width = DEFAULT_SLIDER_MAX
         if self.ratio > 1:
-            self.min_corr_height = int(float(100)*self.ratio)
+            self.min_corr_height = int(float(DEFAULT_SLIDER_MIN)*self.ratio)
         else:
-            self.max_corr_height = int(float(3000)*self.ratio)
+            self.max_corr_height = int(float(DEFAULT_SLIDER_MAX)*self.ratio)
         
         if 1/self.ratio > 1:
-            self.min_corr_width = int(float(100)/self.ratio)
+            self.min_corr_width = int(float(DEFAULT_SLIDER_MIN)/self.ratio)
         else:
-            self.max_corr_width = int(float(3000)/self.ratio)
+            self.max_corr_width = int(float(DEFAULT_SLIDER_MAX)/self.ratio)
 
         
 
 
 if __name__ == "__main__":
     root = Tk()
-    root.resizable(False, False) #disable resizing
+    # root.resizable(False, False) #disable resizing
     MainApplication(root)
     root.mainloop()
