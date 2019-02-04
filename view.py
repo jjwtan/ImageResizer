@@ -42,7 +42,7 @@ class View(object):
         self.canvas = Canvas(self.parent, width=INIT_CANVAS_WIDTH, height=INIT_CANVAS_HEIGHT, borderwidth=2)
         self.canvas.grid(row=0, column=0, columnspan=4)
         self.tk_image = self.controller.get_blank_tk_image()
-        self.image_on_canvas = self.canvas.create_image(0, 0, anchor=NW, image=self.tk_image)
+        self.image_on_canvas = self.canvas.create_image(0, 0, anchor=CENTER, image=self.tk_image)
 
 
     def open_file(self):
@@ -69,6 +69,10 @@ class View(object):
             self.set_slider_min_max(self.height_slider, min_height, max_height)
             self.canvas.config(width=self.tk_image.width(), height=self.tk_image.height())
             self.canvas.itemconfig(self.image_on_canvas, image=self.tk_image)
+            self.canvas.coords(self.image_on_canvas, (self.tk_image.width()/2, self.tk_image.height()/2))
+
+    def update_thumbnail_image(self, tkImage):
+        self.canvas.itemconfig(self.image_on_canvas, image=tkImage)
 
     def update_window_size(self):
         if self.tk_image.width() < WINDOW_MIN_WIDTH: # handling for narrow images
@@ -82,6 +86,8 @@ class View(object):
 
     def update_height_slider(self, value):
         self.height_slider.set(self.controller.cal_corr_height(value))
+        self.tk_image = self.controller.resize_image(self.width_slider.get(), self.height_slider.get())
+        self.update_thumbnail_image(self.tk_image)
 
     def update_width_slider(self, value):
         self.width_slider.set(self.controller.cal_corr_width(value))
