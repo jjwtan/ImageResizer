@@ -1,23 +1,16 @@
+import os
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from PIL import Image
 from PIL import ImageTk
 from configurations import *
-import os
+from view import View
 
 class MainApplication():
 
     def __init__(self, parent):
-        parent.title("Image Resizer")
-        parent.grid_rowconfigure(0, weight=2)
-        parent.grid_rowconfigure(2, weight=1)
-        parent.grid_rowconfigure(3, weight=1)
-        parent.grid_columnconfigure(0, weight=1)
-        parent.grid_columnconfigure(1, weight=1)
-        parent.grid_columnconfigure(2, weight=1)
-        parent.grid_columnconfigure(3, weight=1)
-        parent.geometry("{}x{}+20+20".format(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT))
+        self.view = View(parent)
 
         # build inital canvas
         self.canvas = Canvas(parent, width=INIT_CANVAS_WIDTH, height=INIT_CANVAS_HEIGHT, borderwidth=2)
@@ -37,10 +30,10 @@ class MainApplication():
 
         self.open_button = ttk.Button(parent, text="Open", command= lambda: self.update_image(parent))
         self.open_button.grid(row=3, column=0, sticky=NSEW)
-        self.open_button = ttk.Button(parent, text="Save", command=self.save_image)
-        self.open_button.grid(row=3, column=1, columnspan=2, sticky=NSEW)
-        self.open_button = ttk.Button(parent, text="Reset", command=self.reset_sliders)
-        self.open_button.grid(row=3, column=3, sticky=NSEW)
+        self.save_button = ttk.Button(parent, text="Save", command=self.save_image)
+        self.save_button.grid(row=3, column=1, columnspan=2, sticky=NSEW)
+        self.reset_button = ttk.Button(parent, text="Reset", command=self.reset_sliders)
+        self.reset_button.grid(row=3, column=3, sticky=NSEW)
 
         self.update_image(parent)
 
@@ -110,7 +103,6 @@ class MainApplication():
             self.max_corr_width = int(float(DEFAULT_SLIDER_MAX)/self.ratio)
 
         
-
 
 if __name__ == "__main__":
     root = Tk()
