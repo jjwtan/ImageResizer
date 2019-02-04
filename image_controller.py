@@ -33,7 +33,6 @@ class ImageController(object):
         return self.tk_image
 
     def resize_image(self, width, height):
-        self.thumnail = self.pil_original_image.copy()
         if width > MAX_IMAGE_THUMBNAIL_WIDTH or height > MAX_IMAGE_THUMBNAIL_HEIGHT:
             return self.tk_image
         else:
@@ -49,7 +48,7 @@ class ImageController(object):
         self.pil_original_image = Image.open(file_path)
         self.pil_image = self.pil_original_image.copy() # keep original image for resizing
         self.ratio=float(self.pil_original_image.height)/self.pil_original_image.width
-        self.pil_image.thumbnail((MAX_IMAGE_THUMBNAIL_HEIGHT,MAX_IMAGE_THUMBNAIL_WIDTH), Image.ANTIALIAS) # resize image
+        self.pil_image.thumbnail((MAX_IMAGE_THUMBNAIL_WIDTH,MAX_IMAGE_THUMBNAIL_HEIGHT), Image.ANTIALIAS) # resize image
         self.pil_image_thumnail = self.pil_image.copy() # keep original image for resizing
         return self.pil_image
 
