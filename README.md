@@ -9,5 +9,5 @@ python main_application.py
 
 ## Creating exe
 ```
-pyinstaller -w -F -i <icon file> MainApplication.py
+pyinstaller -w -F -i <icon file> main_application.py
 ```
